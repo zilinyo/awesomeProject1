@@ -97,6 +97,13 @@ func checkout(c *gin.Context) {
 	h := sha1.New()
 	h.Write([]byte(sha1String))
 	sha1String = hex.EncodeToString(h.Sum([]byte("")))
+	log.Logs.Log("参数为", map[string]interface{}{
+		"signature":  signature,
+		"timestamp":  timestamp,
+		"nonce":      nonce,
+		"echostr":    echostr,
+		"sha1String": sha1String,
+	})
 	//获得加密后的字符串可与signature对比
 	if sha1String == signature {
 		log.Logs.Log("对比成功。。。")
