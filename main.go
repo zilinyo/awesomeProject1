@@ -9,11 +9,10 @@ import (
 	"fmt"
 	"sort"
 
-	//"github.com/silenceper/wechat/v2"
-	//"github.com/silenceper/wechat/v2/cache"
-	//offConfig "github.com/silenceper/wechat/v2/officialaccount/config"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/rest"
+	"github.com/silenceper/wechat/v2"
+	offConfig "github.com/silenceper/wechat/v2/officialaccount/config"
 )
 
 /*
@@ -32,14 +31,18 @@ func main() {
 	r := gin.Default()
 	//http.HandleFunc("/", checkout)
 	r.GET("/", checkout)
-	//r.GET("/ping", func(c *gin.Context) {
-	//	token, _ := GetAccessToken()
-	//	c.JSON(200, gin.H{
-	//		"token": token,
-	//	})
-	//})
+	r.GET("/ping", Ping)
 	r.Run(":80")
-	//wc := wechat.NewWechat()
+}
+
+type AccessTokenResponse struct {
+	AccessToken string  `json:"access_token"`
+	ExpiresIn   float64 `json:"expires_in"`
+}
+
+//群发消息
+func Ping(c *gin.Context) {
+	wc := wechat.NewWechat()
 	//redisOpts := &cache.RedisOpts{
 	//	Host:        "127.0.0.1:6379",
 	//	Database:    1,
@@ -48,32 +51,28 @@ func main() {
 	//	IdleTimeout: 60, //second
 	//}
 	//redisCache := cache.NewRedis(redisOpts)
-	//cfg := &offConfig.Config{
-	//	AppID:     "wx870e0c515d19cde4",
-	//	AppSecret: "ae4bf23de5e9fb9680d1fccfaf0fbbed",
-	//	Token:     token,
-	//	//EncodingAESKey: "xxxx",
-	//	Cache: redisCache,
-	//}
-	//oa := wc.GetOfficialAccount(cfg)
-	//bd:=oa.GetBroadcast()
-	//
-	//text, err := bd.SendText( &User{
-	//	TagID: 1,
-	//	OpenID: "",
-	//}, "sssss")
-	//if err != nil{
-	//		fmt.Errorf("error is %s",err)
-	//}
-	//fmt.Printf("msg is %v",text)
-	//officialAccount := wc.GetOfficialAccount(cfg)
-}
+	cfg := &offConfig.Config{
+		AppID:     "wx870e0c515d19cde4",
+		AppSecret: "ae4bf23de5e9fb9680d1fccfaf0fbbed",
+		Token:     "token",
+		//EncodingAESKey: "xxxx",
+		//Cache: redisCache,
+	}
+	oa := wc.GetOfficialAccount(cfg)
+	bd := oa.GetBroadcast()
 
-type AccessTokenResponse struct {
-	AccessToken string  `json:"access_token"`
-	ExpiresIn   float64 `json:"expires_in"`
-}
+	text, err := bd.SendText(nil, "sssss")
+	log.Logs.Log("日志开启",
+		map[string]interface{}{
+			"text": text,
+			"err":  err,
+		})
 
+	if err != nil {
+		fmt.Errorf("error is %s", err)
+	}
+	fmt.Printf("msg is %v", text)
+}
 func checkout(c *gin.Context) {
 	//解析URL参数
 	// token
