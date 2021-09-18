@@ -8,7 +8,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/silenceper/wechat/v2/cache"
+	"github.com/silenceper/wechat/v2/officialaccount/broadcast"
+	"os"
+	"os/signal"
 	"sort"
+	"syscall"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/rest"
@@ -33,7 +37,21 @@ func main() {
 	//http.HandleFunc("/", checkout)
 	r.GET("/", checkout)
 	r.GET("/ping", Ping)
-	r.Run(":80")
+	r.GET("/userInfo", UserInfo)
+
+	errChan := make(chan error)
+
+	go func() {
+		fmt.Println("Http Server start at port:8073")
+		errChan <- r.Run(":80")
+	}()
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM) //监听强制退出
+		errChan <- fmt.Errorf("%s", <-c)
+	}()
+	_ = log.GetLogger().Log("异常退出", <-errChan)
+	//r.Run(":80")
 }
 
 type AccessTokenResponse struct {
@@ -41,8 +59,18 @@ type AccessTokenResponse struct {
 	ExpiresIn   float64 `json:"expires_in"`
 }
 
+func UserInfo(c *gin.Context) {
+	signature := c.Request.URL.RawQuery
+	log.GetLogger().Log("userinfo", signature)
+	c.JSON(200, gin.H{"msg": "success"})
+	return
+}
+
 //群发消息
 func Ping(c *gin.Context) {
+	token, _ := GetAccessToken()
+	c.JSON(200, gin.H{"msg": token})
+	return
 	wc := wechat.NewWechat()
 	redisOpts := &cache.RedisOpts{
 		Host:        "127.0.0.1:6379",
@@ -61,8 +89,12 @@ func Ping(c *gin.Context) {
 	}
 	oa := wc.GetOfficialAccount(cfg)
 	bd := oa.GetBroadcast()
+	users := &User{
+		TagID:  1,
+		OpenID: []string{"1"},
+	}
 
-	text, err := bd.SendText(nil, "sssss")
+	text, err := bd.SendText((*broadcast.User)(users), "sssss")
 	log.Logs.Log("日志开启",
 		map[string]interface{}{
 			"text": text,
@@ -70,10 +102,11 @@ func Ping(c *gin.Context) {
 		})
 
 	if err != nil {
-		c.JSON(500, gin.H{"err": err})
+		c.JSON(400, gin.H{"test": text, "err": err})
 		return
 	}
 	c.JSON(200, gin.H{"msg": text})
+	return
 }
 func checkout(c *gin.Context) {
 	//解析URL参数
@@ -127,6 +160,7 @@ func GetAccessToken() (str string, err error) {
 	if err != nil {
 		fmt.Errorf("errosis%s", err.Error())
 	}
+	log.GetLogger().Log("data", response.Body)
 	if bytes.Contains([]byte(response.Body), []byte("access_token")) {
 		atr := AccessTokenResponse{}
 		err = json.Unmarshal([]byte(response.Body), &atr)
