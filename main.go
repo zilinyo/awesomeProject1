@@ -88,7 +88,7 @@ func Ping(c *gin.Context) {
 	bd := oa.GetBroadcast()
 	users := &User{
 		TagID:  1,
-		OpenID: []string{"ojMDM6lPYLERook4WX9qVWPPY944"},
+		OpenID: []string{"ojMDM6lPYLERook4WX9qVWPPY944", "ojMDM6iEvA73V1e9BO_boCLTqVts"},
 	}
 
 	text, err := bd.SendText((*broadcast.User)(users), "sssss")
