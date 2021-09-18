@@ -69,9 +69,10 @@ func Ping(c *gin.Context) {
 		})
 
 	if err != nil {
-		fmt.Errorf("error is %s", err)
+		c.JSON(500, gin.H{"err": err})
+		return
 	}
-	fmt.Printf("msg is %v", text)
+	c.JSON(200, gin.H{"msg": text})
 }
 func checkout(c *gin.Context) {
 	//解析URL参数
