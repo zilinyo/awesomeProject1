@@ -108,6 +108,7 @@ func checkout(response http.ResponseWriter, request *http.Request) {
 	} else {
 		log.Logs.Log("验证失败。。。")
 	}
+	log.Logs.Log("验证成功。。。")
 }
 func GetAccessToken() (str string, err error) {
 	const host = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx870e0c515d19cde4&secret=ae4bf23de5e9fb9680d1fccfaf0fbbed"
