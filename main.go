@@ -31,13 +31,14 @@ type User struct {
 func main() {
 	log.Logs.Log("日志开启")
 	r := gin.Default()
-	http.HandleFunc("/", checkout)
-	r.GET("/ping", func(c *gin.Context) {
-		token, _ := GetAccessToken()
-		c.JSON(200, gin.H{
-			"token": token,
-		})
-	})
+	//http.HandleFunc("/", checkout)
+	r.GET("/info", checkout)
+	//r.GET("/ping", func(c *gin.Context) {
+	//	token, _ := GetAccessToken()
+	//	c.JSON(200, gin.H{
+	//		"token": token,
+	//	})
+	//})
 	r.Run(":80")
 	//wc := wechat.NewWechat()
 	//redisOpts := &cache.RedisOpts{
@@ -74,20 +75,17 @@ type AccessTokenResponse struct {
 	ExpiresIn   float64 `json:"expires_in"`
 }
 
-func checkout(response http.ResponseWriter, request *http.Request) {
+func checkout(c *gin.Context) {
 	//解析URL参数
-	err := request.ParseForm()
-	if err != nil {
-		fmt.Println("URL解析失败！")
-		return
-	}
 	// token
-	var token string = "iwuqing"
+
+	accessToken, _ := GetAccessToken()
+	token := accessToken
 	// 获取参数
-	signature := request.FormValue("signature")
-	timestamp := request.FormValue("timestamp")
-	nonce := request.FormValue("nonce")
-	echostr := request.FormValue("echostr")
+	signature := c.Query("signature")
+	timestamp := c.Query("timestamp")
+	nonce := c.Query("nonce")
+	echostr := c.Query("echostr")
 	//将token、timestamp、nonce三个参数进行字典序排序
 	var tempArray = []string{token, timestamp, nonce}
 	sort.Strings(tempArray)
@@ -101,10 +99,8 @@ func checkout(response http.ResponseWriter, request *http.Request) {
 	sha1String = hex.EncodeToString(h.Sum([]byte("")))
 	//获得加密后的字符串可与signature对比
 	if sha1String == signature {
-		_, err := response.Write([]byte(echostr))
-		if err != nil {
-			log.Logs.Log("响应失败。。。参数", sha1String)
-		}
+		log.Logs.Log("对比成功。。。")
+		c.JSON(http.StatusOK, []byte(echostr))
 	} else {
 		log.Logs.Log("验证失败。。。")
 	}
