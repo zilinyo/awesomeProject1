@@ -1,6 +1,7 @@
 package main
 
 import (
+	"awesomeProject/log"
 	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
@@ -28,6 +29,7 @@ type User struct {
 }
 
 func main() {
+	log.Logs.Log("日志开启")
 	r := gin.Default()
 	http.HandleFunc("/", checkout)
 	r.GET("/ping", func(c *gin.Context) {
@@ -101,10 +103,10 @@ func checkout(response http.ResponseWriter, request *http.Request) {
 	if sha1String == signature {
 		_, err := response.Write([]byte(echostr))
 		if err != nil {
-			fmt.Println("响应失败。。。")
+			log.Logs.Log("响应失败。。。参数", sha1String)
 		}
 	} else {
-		fmt.Println("验证失败")
+		log.Logs.Log("验证失败。。。")
 	}
 }
 func GetAccessToken() (str string, err error) {
