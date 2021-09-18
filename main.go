@@ -37,7 +37,7 @@ func main() {
 	//http.HandleFunc("/", checkout)
 	r.GET("/", checkout)
 	r.GET("/ping", Ping)
-	r.GET("/userInfo", UserInfo)
+	r.POST("/userInfo", UserInfo)
 
 	errChan := make(chan error)
 
@@ -68,9 +68,6 @@ func UserInfo(c *gin.Context) {
 
 //群发消息
 func Ping(c *gin.Context) {
-	token, _ := GetAccessToken()
-	c.JSON(200, gin.H{"msg": token})
-	return
 	wc := wechat.NewWechat()
 	redisOpts := &cache.RedisOpts{
 		Host:        "127.0.0.1:6379",
@@ -91,7 +88,7 @@ func Ping(c *gin.Context) {
 	bd := oa.GetBroadcast()
 	users := &User{
 		TagID:  1,
-		OpenID: []string{"1"},
+		OpenID: []string{"ojMDM6lPYLERook4WX9qVWPPY944"},
 	}
 
 	text, err := bd.SendText((*broadcast.User)(users), "sssss")
