@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"sort"
 
 	//"github.com/silenceper/wechat/v2"
@@ -107,7 +106,9 @@ func checkout(c *gin.Context) {
 	//获得加密后的字符串可与signature对比
 	if sha1String == signature {
 		log.Logs.Log("对比成功。。。")
-		c.JSON(http.StatusOK, []byte(echostr))
+		c.Writer.Write([]byte(echostr))
+		//c.JSON(http.StatusOK, []byte(echostr))
+		return
 	} else {
 		log.Logs.Log("验证失败。。。")
 	}
