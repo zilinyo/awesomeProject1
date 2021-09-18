@@ -32,7 +32,7 @@ func main() {
 	log.Logs.Log("日志开启")
 	r := gin.Default()
 	//http.HandleFunc("/", checkout)
-	r.GET("/info", checkout)
+	r.GET("/", checkout)
 	//r.GET("/ping", func(c *gin.Context) {
 	//	token, _ := GetAccessToken()
 	//	c.JSON(200, gin.H{
