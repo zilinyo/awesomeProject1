@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/silenceper/wechat/v2/cache"
 	"sort"
 
 	"github.com/gin-gonic/gin"
@@ -43,20 +44,20 @@ type AccessTokenResponse struct {
 //群发消息
 func Ping(c *gin.Context) {
 	wc := wechat.NewWechat()
-	//redisOpts := &cache.RedisOpts{
-	//	Host:        "127.0.0.1:6379",
-	//	Database:    1,
-	//	MaxActive:   10,
-	//	MaxIdle:     10,
-	//	IdleTimeout: 60, //second
-	//}
-	//redisCache := cache.NewRedis(redisOpts)
+	redisOpts := &cache.RedisOpts{
+		Host:        "127.0.0.1:6379",
+		Database:    1,
+		MaxActive:   10,
+		MaxIdle:     10,
+		IdleTimeout: 60, //second
+	}
+	redisCache := cache.NewRedis(redisOpts)
 	cfg := &offConfig.Config{
 		AppID:     "wx870e0c515d19cde4",
 		AppSecret: "ae4bf23de5e9fb9680d1fccfaf0fbbed",
 		Token:     "token",
 		//EncodingAESKey: "xxxx",
-		//Cache: redisCache,
+		Cache: redisCache,
 	}
 	oa := wc.GetOfficialAccount(cfg)
 	bd := oa.GetBroadcast()
