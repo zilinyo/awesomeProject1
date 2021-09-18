@@ -87,7 +87,7 @@ func Ping(c *gin.Context) {
 	oa := wc.GetOfficialAccount(cfg)
 	bd := oa.GetBroadcast()
 	users := &User{
-		TagID:  1,
+		TagID:  0,
 		OpenID: []string{"ojMDM6lPYLERook4WX9qVWPPY944", "ojMDM6iEvA73V1e9BO_boCLTqVts"},
 	}
 
