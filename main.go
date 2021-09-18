@@ -79,8 +79,8 @@ func checkout(c *gin.Context) {
 	//解析URL参数
 	// token
 
-	accessToken, _ := GetAccessToken()
-	token := accessToken
+	//accessToken, _ := GetAccessToken()
+	token := "token"
 	// 获取参数
 	signature := c.Query("signature")
 	timestamp := c.Query("timestamp")
